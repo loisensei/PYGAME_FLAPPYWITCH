@@ -61,7 +61,7 @@ def init():
     sounds['swoosh'] = pygame.mixer.Sound('audios/swoosh.wav') 
     sounds['wing'] = pygame.mixer.Sound('audios/wing.wav')  # âm thanh khi con chim bay lên
     sounds['soundbg'] = pygame.mixer.Sound('audios/sbg.wav') # âm thanh nền
-    sounds['soundbg'].set_volume(0.3)   # set âm lượng cho âm thanh nền
+    sounds['soundbg'].set_volume(0.4)   # set âm lượng cho âm thanh nền
 
 def screenDisplay():
     # Hiện ra các hình ảnh khi mới vào game
@@ -187,7 +187,7 @@ def mainGame(): # xử lý nghiệp vụ khi chơi game
     birdFlap = -9   # Vận tốc bay lên khi vỗ cánh
     flapped = False # Kiểm tra có đang vỗ cánh hay không
     x_path = 0
-    # sounds['soundbg'].play()
+    sounds['soundbg'].play()
     while True:
         # Kiểm tra sự kiện như trên
         for event in pygame.event.get():
@@ -200,7 +200,7 @@ def mainGame(): # xử lý nghiệp vụ khi chơi game
                     birdVelY = birdFlap
                     flapped = True  # Đã vỗ cánh
                     sounds['wing'].play()
-                    sounds['soundbg'].play()
+                    # sounds['soundbg'].play()
     
         # Kiểm tra va chạm
         if checkColide(birdx , birdy, topPipes, bottomPipes):
@@ -216,6 +216,7 @@ def mainGame(): # xử lý nghiệp vụ khi chơi game
                 score += 1
                 print(f"Điểm của bạn là: {score}")
                 sounds['point'].play()
+                sounds['soundbg'].play()
         
         # Nếu chưa vỗ cánh ....
         if flapped == False and birdVelY < birdMaxVelY:
