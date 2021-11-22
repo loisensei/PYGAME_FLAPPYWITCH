@@ -1,12 +1,14 @@
 #import thư viện: pygame, random, ...
 from math import fabs, pi
+from time import sleep
 import pygame, random, sys
+from pygame import time
 from pygame.locals import *     
 
 # khởi tạo tất cả các modul cần thiết cho pygame (hoặc pygame.init())
-# pygame.init()
-# clock = pygame.time.Clock()     # Mục tiêu là có thể đặt FPS cố định giúp trò chơi chạy ở cùng tốc độ trên máy tính nhanh hay chậm.
-fps = 32    # Tốc độ khung hình/s
+pygame.init()
+clock = pygame.time.Clock()     # Mục tiêu là có thể đặt FPS cố định giúp trò chơi chạy ở cùng tốc độ trên máy tính nhanh hay chậm.
+fps = 32    # Tốc độ khung hình/s 
 screenWidth = 400  # Chiều rộng cửa sổ game
 screenHeight = 511  # Chiều dài cửa sổ game
 screen = pygame.display.set_mode((screenWidth, screenHeight))   # set kích thước cửa sổ game
@@ -65,7 +67,7 @@ def init():
 
 def screenDisplay():
     # Hiện ra các hình ảnh khi mới vào game
-    birdx = int(screenWidth/5)
+    birdx = int(screenWidth/5 + 10)
     birdy = int((screenHeight - Items['bird'].get_height()) / 2)
     messx = int((screenWidth - Items['mess'].get_width()) / 2)
     messy = int(screenHeight * 0.13)
@@ -153,11 +155,10 @@ def checkColide(birdx , birdy, topPipes, bottomPipes):
             return True
     
     return False
-    
 
 def mainGame(): # xử lý nghiệp vụ khi chơi game
     score = 0  # Khởi tạo điểm số
-    birdx = int(screenWidth/5)   # Khởi tạo vị trí (x,y) của bird
+    birdx = int(screenWidth/5 + 10)   # Khởi tạo vị trí (x,y) của bird
     birdy = int(screenHeight/2)
     pathx = 0   # Khởi tạo vị trí của path
 
@@ -187,7 +188,10 @@ def mainGame(): # xử lý nghiệp vụ khi chơi game
     birdFlap = -9   # Vận tốc bay lên khi vỗ cánh
     flapped = False # Kiểm tra có đang vỗ cánh hay không
     x_path = 0
+    # sounds['soundbg'].play()
+    # runBgSounds()
     sounds['soundbg'].play()
+    countPipe = 0
     while True:
         # Kiểm tra sự kiện như trên
         for event in pygame.event.get():
@@ -200,14 +204,13 @@ def mainGame(): # xử lý nghiệp vụ khi chơi game
                     birdVelY = birdFlap
                     flapped = True  # Đã vỗ cánh
                     sounds['wing'].play()
-                    # sounds['soundbg'].play()
     
         # Kiểm tra va chạm
         if checkColide(birdx , birdy, topPipes, bottomPipes):
             return
-        
+       
         # Tính điểm và hiển thị điểm
-        birdMid = birdx + Items['bird'].get_width()/2   # vị trí giữa của bird
+        birdMid = birdx + Items['bird'].get_width()/2   # vị trí giữa của bird 
         # Duyệt các ống
         # Khi bird bay qua giữa ống thì bắt đầu cộng điểm, lên nhạc
         for pipe in topPipes:
@@ -216,7 +219,13 @@ def mainGame(): # xử lý nghiệp vụ khi chơi game
                 score += 1
                 print(f"Điểm của bạn là: {score}")
                 sounds['point'].play()
-                sounds['soundbg'].play()
+                countPipe += 1
+        
+        # Cứ sau khi bay qua 3 pipe là âm thanh nền tiếp tục được phát
+        if countPipe == 3:
+            sounds['soundbg'].play()
+            countPipe = 0
+                    
         
         # Nếu chưa vỗ cánh ....
         if flapped == False and birdVelY < birdMaxVelY:
