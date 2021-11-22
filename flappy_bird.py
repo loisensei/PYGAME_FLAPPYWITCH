@@ -1,5 +1,4 @@
 #import thư viện: pygame, random, ...
-from math import fabs, pi
 from time import sleep
 import pygame, random, sys
 from pygame import time
@@ -38,22 +37,22 @@ def init():
     Items['background'] = pygame.image.load(background).convert_alpha()
     Items['bird'] = pygame.image.load(bird).convert_alpha()
     Items['mess'] = pygame.image.load('items/message.png').convert_alpha()
-    Items['path'] = pygame.image.load('items/path5.png').convert_alpha()
+    Items['path'] = pygame.image.load('items/path6.png').convert_alpha()
     
-    # pipe
-    topPipe = pygame.transform.rotate(pygame.image.load(pipe).convert_alpha() , 180)
+    # setup pipe
+    topPipe = pygame.transform.rotate(pygame.image.load(pipe).convert_alpha() , 180)    # Đảo ngược pipe
     topPipe = pygame.transform.scale(topPipe, (60, 320))
     bottomPipe = pygame.image.load(pipe).convert_alpha()
     bottomPipe = pygame.transform.scale(bottomPipe, (60, 320))
-    
-    
     Items['pipe'] = (topPipe, bottomPipe)
-    pygame.display.set_icon(Items['bird'])  # Set icon của game
+    
+    # Set icon của game
+    pygame.display.set_icon(Items['bird'])  
 
     # Set kích thước của các item trong game:
     Items['background'] = pygame.transform.scale(Items['background'], (630, 720))   # set kích thước cho background
     Items['bird'] = pygame.transform.scale(Items['bird'], (75, 65)) # set kích thước cho witch
-    Items['path'] = pygame.transform.scale(Items['path'], (screenWidth, 112)) # set kích thước cho witch
+    Items['path'] = pygame.transform.scale(Items['path'], (screenWidth, 112)) # set kích thước cho path
     
     
     # Thêm các âm thanh vào list sounds
@@ -132,7 +131,7 @@ def checkColide(birdx , birdy, topPipes, bottomPipes):
 
     # Nếu bird cao hơn đường (path) hoặc thấp hơn 0
     # Thì thông báo va chạm
-    if birdy > groundy-71 or birdy < 0:
+    if birdy > groundy-70 or birdy < 0:
         sounds['hit'].play() # phát âm thanh 
         sounds['soundbg'].stop()
         return True
@@ -182,7 +181,7 @@ def mainGame(): # xử lý nghiệp vụ khi chơi game
     pipeVelX = -4
     birdVelY = -9
     birdMinVelY = -8
-    birdMaxVelY = 10
+    birdMaxVelY = 20    # Tốc độ rơi
     birdAccy = 1.3    # trong lượng của bird
 
     birdFlap = -9   # Vận tốc bay lên khi vỗ cánh
@@ -192,6 +191,9 @@ def mainGame(): # xử lý nghiệp vụ khi chơi game
     # runBgSounds()
     sounds['soundbg'].play()
     countPipe = 0
+    countPoint = 0      # Biến hỗ trợ việc tăng tốc độ của game
+    dem = 0     # Biến hỗ trợ việc tăng tốc độ của game
+    
     while True:
         # Kiểm tra sự kiện như trên
         for event in pygame.event.get():
@@ -215,17 +217,24 @@ def mainGame(): # xử lý nghiệp vụ khi chơi game
         # Khi bird bay qua giữa ống thì bắt đầu cộng điểm, lên nhạc
         for pipe in topPipes:
             pipeMid = pipe['x'] + Items['pipe'][0].get_width()/2    # vị trí giữa của ống
-            if pipeMid <= birdMid < pipeMid + 4:
+            if pipeMid <= birdMid < pipeMid + 4 + 2*dem:
                 score += 1
                 print(f"Điểm của bạn là: {score}")
                 sounds['point'].play()
                 countPipe += 1
+                countPoint += 1
         
         # Cứ sau khi bay qua 3 pipe là âm thanh nền tiếp tục được phát
         if countPipe == 3:
             sounds['soundbg'].play()
             countPipe = 0
                     
+        # Nếu trên 5, 10, 15, 20, ... điểm thì bay nhanh hơn:
+        if countPoint % 5 == 0 and countPoint > 0:
+            pipeVelX -= 1
+            dem += 1
+            continue
+        
         
         # Nếu chưa vỗ cánh ....
         if flapped == False and birdVelY < birdMaxVelY:
@@ -234,6 +243,7 @@ def mainGame(): # xử lý nghiệp vụ khi chơi game
         # Nếu vỗ cánh
         if flapped:
             flapped = False
+            
         # Update vị trí mới cho bird
         birdHeight = Items['bird'].get_height()
         birdy = birdy + min(birdVelY , groundy - birdy - birdHeight)
@@ -244,7 +254,7 @@ def mainGame(): # xử lý nghiệp vụ khi chơi game
             bot['x'] += pipeVelX
         
         # Thêm một đường ống mới khi ống cũ sắp vượt ra khỏi màn hình
-        if 0 < topPipes[0]['x'] < 5:
+        if 0 < topPipes[0]['x'] < (pipeVelX - 2*pipeVelX) + 1:
             newPipe = getRandomPipe()
             topPipes.append(newPipe[0])
             bottomPipes.append(newPipe[1])
