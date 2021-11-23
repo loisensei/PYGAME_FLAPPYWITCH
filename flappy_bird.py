@@ -14,11 +14,24 @@ screen = pygame.display.set_mode((screenWidth, screenHeight))   # set kích thư
 groundy = screenHeight * 0.8    # vị trí tối đa để đặt các items là 80% chiều cao của screen
 Items = {}
 sounds = {}
-bird = 'items/b2.png'
+bird = 'items/witch.png'
 background = 'items/bg4.jpg'
 pipe = 'items/pipe1.png'
+list_thunder = []
+timer_thunder = pygame.USEREVENT
 
 def init():
+    pygame.time.set_timer(timer_thunder, 4000)
+    thunder3 = pygame.image.load('items/thunder3.png').convert_alpha()
+    thunder2 = pygame.image.load('items/thunder2.png').convert_alpha()
+    thunder1 = pygame.image.load('items/thunder1.png').convert_alpha()
+    thunder4 = pygame.image.load('items/thunder4.png').convert_alpha()
+    Items['thunder1'] = pygame.transform.scale(thunder3, (300, 300))
+    list_thunder.append(Items['thunder1'])
+    list_thunder.append(pygame.transform.scale(thunder2, (300, 300)))
+    list_thunder.append(pygame.transform.scale(thunder1, (178, 200)))
+    list_thunder.append(pygame.transform.scale(thunder4, (178, 200)))
+
     # Thêm các số vào list Items
     Items['numbers'] = {
         pygame.image.load('items/0.png').convert_alpha(),
@@ -51,7 +64,7 @@ def init():
 
     # Set kích thước của các item trong game:
     Items['background'] = pygame.transform.scale(Items['background'], (630, 720))   # set kích thước cho background
-    Items['bird'] = pygame.transform.scale(Items['bird'], (75, 65)) # set kích thước cho witch
+    Items['bird'] = pygame.transform.scale(Items['bird'], (70, 60)) # set kích thước cho witch
     Items['path'] = pygame.transform.scale(Items['path'], (screenWidth, 112)) # set kích thước cho path
     
     
@@ -97,6 +110,7 @@ def setUpScreen():
             else:
                 screenDisplay()
                 
+            
 
 
 # Viết hàm tạo random các ống (pipe) trên - dưới:
@@ -193,7 +207,8 @@ def mainGame(): # xử lý nghiệp vụ khi chơi game
     countPipe = 0
     countPoint = 0      # Biến hỗ trợ việc tăng tốc độ của game
     dem = 0     # Biến hỗ trợ việc tăng tốc độ của game
-    
+
+    thunder_index = 0
     while True:
         # Kiểm tra sự kiện như trên
         for event in pygame.event.get():
@@ -206,6 +221,11 @@ def mainGame(): # xử lý nghiệp vụ khi chơi game
                     birdVelY = birdFlap
                     flapped = True  # Đã vỗ cánh
                     sounds['wing'].play()
+            if event.type == timer_thunder:
+                if thunder_index < 2:
+                    thunder_index += 1
+                else:
+                    thunder_index = 0
     
         # Kiểm tra va chạm
         if checkColide(birdx , birdy, topPipes, bottomPipes):
@@ -277,6 +297,7 @@ def mainGame(): # xử lý nghiệp vụ khi chơi game
         if x_path <= -400:
             x_path = 0
         
+        screen.blit(list_thunder[thunder_index], (random.randint(-80, 200), 0))
         # Hiển thị bird
         screen.blit(Items['bird'] , (birdx , birdy))
         # screen.blit(Items['bird'] , (screenWidth/2 , 5))
