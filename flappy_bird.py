@@ -172,11 +172,8 @@ def checkColide(birdx, birdy, topPipes, bottomPipes):
     return False
 
 
-def draw_thunder(index, i):
-    while i > 0:
-        i -= 1
-        print('thunder')
-        screen.blit(list_thunder[index], (random.randint(-80, 200), 0))
+def rotate_witch(y):
+    return pygame.transform.rotozoom(Items['bird'], -y, 1)
 
 
 def mainGame():  # xử lý nghiệp vụ khi chơi game
@@ -303,6 +300,14 @@ def mainGame():  # xử lý nghiệp vụ khi chơi game
 
         # Tiếp tục hiển thị các hình ảnh
         screen.blit(Items['background'], (-80, 0))  # Hiển thị background
+
+        # hiển thị sét
+        if x_path <= -400:
+            x_path = 0
+        if thunder_mod and timer_draw:
+            screen.blit(list_thunder[thunder_index], (thunder_x, 0))
+
+        # hiển thị ống
         for top, bot in zip(topPipes, bottomPipes):
             screen.blit(Items['pipe'][0], (top['x'], top['y']))
             screen.blit(Items['pipe'][1], (bot['x'], bot['y']))
@@ -311,12 +316,9 @@ def mainGame():  # xử lý nghiệp vụ khi chơi game
         x_path -= 3
         screen.blit(Items['path'], (x_path, groundy))
         screen.blit(Items['path'], (x_path + 400, groundy))
-        if x_path <= -400:
-            x_path = 0
-        if thunder_mod and timer_draw:
-            screen.blit(list_thunder[thunder_index], (thunder_x, 0))
+
         # Hiển thị bird
-        screen.blit(Items['bird'], (birdx, birdy))
+        screen.blit(rotate_witch(birdVelY), (birdx, birdy))
         # screen.blit(Items['bird'] , (screenWidth/2 , 5))
         pygame.display.update()
         clock.tick(fps)
