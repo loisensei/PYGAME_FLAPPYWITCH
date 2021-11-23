@@ -240,7 +240,6 @@ def mainGame():  # xử lý nghiệp vụ khi chơi game
             if event.type == timer_draw:
                 if thunder_mod:
                     thunder_mod = False
-                thunder_x = random.randint(-80, 300)
 
         # Kiểm tra va chạm
         if checkColide(birdx, birdy, topPipes, bottomPipes):
@@ -300,11 +299,11 @@ def mainGame():  # xử lý nghiệp vụ khi chơi game
 
         # Tiếp tục hiển thị các hình ảnh
         screen.blit(Items['background'], (-80, 0))  # Hiển thị background
-
-        # hiển thị sét
         if x_path <= -400:
             x_path = 0
-        if thunder_mod and timer_draw:
+
+        # hiển thị sét
+        if thunder_mod:
             screen.blit(list_thunder[thunder_index], (thunder_x, 0))
 
         # hiển thị ống
